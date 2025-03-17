@@ -37,14 +37,6 @@ defmodule PicChatWeb.MessageLive.Index do
     {:noreply, stream_insert(socket, :messages, message)}
   end
 
-  @impl true
-  def handle_event("delete", %{"id" => id}, socket) do
-    message = Messages.get_message!(id)
-    {:ok, _} = Messages.delete_message(message)
-
-    {:noreply, stream_delete(socket, :messages, message)}
-  end
-
   # Index.ex
   @impl true
   def handle_info({PicChatWeb.MessageLive.FormComponent, {:new, message}}, socket) do
@@ -56,5 +48,22 @@ defmodule PicChatWeb.MessageLive.Index do
   def handle_info({PicChatWeb.MessageLive.FormComponent, {:edit, message}}, socket) do
     # updates the new message in its current position
     {:noreply, stream_insert(socket, :messages, message)}
+  end
+
+  @impl true
+  def handle_event("delete", %{"id" => id}, socket) do
+    message = Messages.get_message!(id)
+
+    if message.user_id == socket.assigns.current_user.id do
+      {:ok, _} = Messages.delete_message(message)
+      {:noreply, stream_delete(socket, :messages, message)}
+    else
+      {:noreply,
+       Phoenix.LiveView.put_flash(
+         socket,
+         :error,
+         "You are not authorized to delete this message."
+       )}
+    end
   end
 end
