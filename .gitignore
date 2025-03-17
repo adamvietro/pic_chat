@@ -41,3 +41,5 @@ npm-debug.log
 # ignore vscode settings
 .vscode
 
+# uploaded images
+/priv/static/uploads/

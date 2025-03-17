@@ -6,6 +6,10 @@ defmodule PicChatWeb.MessageLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
+    if connected?(socket) do
+      PicChatWeb.Endpoint.subscribe("messages")
+    end
+
     {:ok, stream(socket, :messages, Messages.list_messages())}
   end
 
@@ -32,6 +36,27 @@ defmodule PicChatWeb.MessageLive.Index do
     |> assign(:message, nil)
   end
 
+  def handle_info(
+        %Phoenix.Socket.Broadcast{topic: "messages", event: "new", payload: message},
+        socket
+      ) do
+    {:noreply, stream_insert(socket, :messages, message, at: 0)}
+  end
+
+  def handle_info(
+        %Phoenix.Socket.Broadcast{topic: "messages", event: "edit", payload: message},
+        socket
+      ) do
+    {:noreply, stream_insert(socket, :messages, message)}
+  end
+
+  def handle_info(
+        %Phoenix.Socket.Broadcast{topic: "messages", event: "delete", payload: message},
+        socket
+      ) do
+    {:noreply, stream_delete(socket, :messages, message)}
+  end
+
   @impl true
   def handle_info({PicChatWeb.MessageLive.FormComponent, {:saved, message}}, socket) do
     {:noreply, stream_insert(socket, :messages, message)}
@@ -56,6 +81,7 @@ defmodule PicChatWeb.MessageLive.Index do
 
     if message.user_id == socket.assigns.current_user.id do
       {:ok, _} = Messages.delete_message(message)
+      PicChatWeb.Endpoint.broadcast_from(self(), "messages", "delete", message)
       {:noreply, stream_delete(socket, :messages, message)}
     else
       {:noreply,
