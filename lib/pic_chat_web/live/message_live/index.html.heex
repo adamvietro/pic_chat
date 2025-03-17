@@ -16,6 +16,7 @@
 >
   <:col :let={{_id, message}} label="Content">{message.content}</:col>
   <:col :let={{_id, message}} label="User Id">{message.user_id}</:col>
+  <:col :let={{_id, message}} label="Picture"><img src={message.picture}/></:col>
   <:action :let={{_id, message}}>
     <div class="sr-only">
       <.link navigate={~p"/messages/#{message}"}>Show</.link>
@@ -52,3 +53,12 @@
     current_user={@current_user}
   />
 </.modal>
+
+<style>
+
+  img {
+    max-height: 50px;
+    max-width: auto;
+  }
+
+</style>

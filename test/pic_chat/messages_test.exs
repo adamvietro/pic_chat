@@ -65,5 +65,15 @@ defmodule PicChat.MessagesTest do
       message = message_fixture(user_id: user.id)
       assert %Ecto.Changeset{} = Messages.change_message(message)
     end
+
+    test "create_message/1 with valid data creates a message with picture" do
+      user = user_fixture()
+      valid_attrs = %{content: "some content", user_id: user.id, picture: "images/picture.png"}
+
+      assert {:ok, %Message{} = message} = Messages.create_message(valid_attrs)
+      assert message.content == "some content"
+      assert message.user_id == user.id
+      assert message.picture == "images/picture.png"
+    end
   end
 end
