@@ -50,8 +50,6 @@ defmodule PicChatWeb.MessageLive.FormComponent do
     file_uploads =
       consume_uploaded_entries(socket, :picture, fn %{path: path}, entry ->
         ext = "." <> get_entry_extension(entry)
-        # The `static/uploads` directory must exist for `File.cp!/2`
-        # and PicChat.static_paths/0 should contain uploads to work,.
         dest = Path.join("priv/static/uploads", Path.basename(path <> ext))
         File.cp!(path, dest)
         {:ok, ~p"/uploads/#{Path.basename(dest)}"}

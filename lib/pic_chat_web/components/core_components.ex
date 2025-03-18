@@ -460,6 +460,8 @@ defmodule PicChatWeb.CoreComponents do
     default: &Function.identity/1,
     doc: "the function for mapping each row before calling the :col and :action slots"
 
+  attr :rest, :global, doc: "the arbitrary HTML attributes to add to the table"
+
   slot :col, required: true do
     attr :label, :string
   end
@@ -487,6 +489,7 @@ defmodule PicChatWeb.CoreComponents do
           id={@id}
           phx-update={match?(%Phoenix.LiveView.LiveStream{}, @rows) && "stream"}
           class="relative divide-y divide-zinc-100 border-t border-zinc-200 text-sm leading-6 text-zinc-700"
+          {@rest}
         >
           <tr :for={row <- @rows} id={@row_id && @row_id.(row)} class="group hover:bg-zinc-50">
             <td

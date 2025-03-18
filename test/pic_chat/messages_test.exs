@@ -76,4 +76,11 @@ defmodule PicChat.MessagesTest do
       assert message.picture == "images/picture.png"
     end
   end
+
+  test "list_messages/1 returns paginated messages" do
+    user = user_fixture()
+    message1 = message_fixture(user_id: user.id)
+    _message2 = message_fixture(user_id: user.id)
+    assert Messages.list_messages(limit: 1, offset: 1) == [message1]
+  end
 end
