@@ -82,6 +82,6 @@ config :phoenix_live_view,
   enable_expensive_runtime_checks: true
 
 # Disable swoosh api client as it is only required for production adapters.
-# config :swoosh, :api_client, false
+config :swoosh, :api_client, false
 # Config :swoosh, :api_client, False is the normal for when we don't want to test
-config :swoosh, api_client: Swoosh.ApiClient.Finch, finch_name: PicChat.Finch
+# config :swoosh, api_client: Swoosh.ApiClient.Finch, finch_name: PicChat.Finch
