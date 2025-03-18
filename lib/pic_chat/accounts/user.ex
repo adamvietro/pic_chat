@@ -8,6 +8,7 @@ defmodule PicChat.Accounts.User do
     field :hashed_password, :string, redact: true
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
+    field :subscribed, :boolean, default: false
 
     has_many :messages, PicChat.Messages.Message
 
@@ -39,7 +40,7 @@ defmodule PicChat.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:email, :password, :subscribed])
     |> validate_email(opts)
     |> validate_password(opts)
   end

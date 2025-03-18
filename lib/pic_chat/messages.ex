@@ -29,6 +29,24 @@ defmodule PicChat.Messages do
   end
 
   @doc """
+  Used to retrieve the messages created on 'today'
+
+  ## Examples
+
+      iex> todays_messages()
+      [%Message{}, ...]
+  """
+  def todays_messages do
+    today = Date.utc_today()
+
+    from(m in Message,
+      where: fragment("date(inserted_at) = ?", ^today),
+      order_by: [desc: :inserted_at, desc: :id]
+    )
+    |> Repo.all()
+  end
+
+  @doc """
   Gets a single message.
 
   Raises `Ecto.NoResultsError` if the Message does not exist.

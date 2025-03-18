@@ -75,12 +75,29 @@ defmodule PicChat.MessagesTest do
       assert message.user_id == user.id
       assert message.picture == "images/picture.png"
     end
-  end
 
-  test "list_messages/1 returns paginated messages" do
-    user = user_fixture()
-    message1 = message_fixture(user_id: user.id)
-    _message2 = message_fixture(user_id: user.id)
-    assert Messages.list_messages(limit: 1, offset: 1) == [message1]
+    test "list_messages/1 returns paginated messages" do
+      user = user_fixture()
+      message1 = message_fixture(user_id: user.id)
+      _message2 = message_fixture(user_id: user.id)
+      assert Messages.list_messages(limit: 1, offset: 1) == [message1]
+    end
+
+    test "todays_messages/0" do
+      user = user_fixture()
+      today_message = message_fixture(user_id: user.id)
+
+      yesterday =
+        DateTime.add(DateTime.utc_now(), -1, :day) |> DateTime.truncate(:second)
+
+      _yesterday_message =
+        PicChat.Repo.insert!(%Message{
+          content: "some content",
+          user_id: user.id,
+          inserted_at: yesterday
+        })
+
+      assert Messages.todays_messages() == [today_message]
+    end
   end
 end

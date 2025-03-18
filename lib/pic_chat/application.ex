@@ -17,7 +17,9 @@ defmodule PicChat.Application do
       # Start a worker by calling: PicChat.Worker.start_link(arg)
       # {PicChat.Worker, arg},
       # Start to serve requests, typically the last entry
-      PicChatWeb.Endpoint
+      PicChatWeb.Endpoint,
+      # Added Oban
+      {Oban, Application.fetch_env!(:pic_chat, Oban)}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
