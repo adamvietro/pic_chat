@@ -43,3 +43,6 @@ npm-debug.log
 
 # uploaded images
 /priv/static/uploads/
+
+#environment
+.env
