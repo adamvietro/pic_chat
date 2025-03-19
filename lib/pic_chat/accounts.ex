@@ -106,7 +106,38 @@ defmodule PicChat.Accounts do
     User.registration_changeset(user, attrs, hash_password: false, validate_email: false)
   end
 
-  ## Settings
+  @doc """
+  Returns an `%Ecto.Changeset{}` for changing the user subscribed
+
+  ## Examples
+
+      iex> change_user_subscription(user)
+      %Ecto.Changeset{data: %User{}}
+  """
+  def change_user_subscription(%User{} = user, attrs \\ %{}) do
+    User.subscription_changeset(user, attrs)
+  end
+
+  @doc """
+  Updates the user subscribed using the given token.
+
+  If the token matches, the user subscribed is updated and the token is deleted.
+  The confirmed_at date is also updated to the current time.
+  """
+  def update_user_subscription(user, attrs) do
+    changeset =
+      user
+      |> User.subscription_changeset(attrs)
+
+    Ecto.Multi.new()
+    |> Ecto.Multi.update(:user, changeset)
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{user: user}} -> {:ok, user}
+      {:error, :user, changeset, _} -> {:error, changeset}
+    end
+  end
+
 
   @doc """
   Returns an `%Ecto.Changeset{}` for changing the user email.
@@ -159,6 +190,12 @@ defmodule PicChat.Accounts do
     end
   end
 
+  @doc """
+  Updates the user subscribed using the given token.
+
+  If the token matches, the user subscribed is updated and the token is deleted.
+  The confirmed_at date is also updated to the current time.
+  """
   defp user_email_multi(user, email, context) do
     changeset =
       user

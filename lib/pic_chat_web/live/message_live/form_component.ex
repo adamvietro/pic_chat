@@ -19,6 +19,7 @@ defmodule PicChatWeb.MessageLive.FormComponent do
         phx-change="validate"
         phx-submit="save"
         phx-drop-target={@uploads.picture.ref}
+        phx-value-user_id={@current_user.id}
       >
         <.input field={@form[:content]} type="text" label="Content" />
         <.live_file_input upload={@uploads.picture} />
@@ -82,6 +83,7 @@ defmodule PicChatWeb.MessageLive.FormComponent do
   end
 
   defp save_message(socket, :new, message_params) do
+    IO.inspect(message_params)
     case Messages.create_message(message_params) do
       {:ok, message} ->
         notify_parent({:new, message})

@@ -35,6 +35,20 @@ defmodule PicChatWeb.UserSettingsLive do
       </div>
       <div>
         <.simple_form
+          for={@subscriber_form}
+          id="subscriber_form"
+          phx-submit="update_subscriber"
+          phx-change="validate_subscriber"
+          phx-trigger-action={@trigger_submit}
+        >
+          <.input field={@subscriber_form[:subscribed]} type="checkbox" label="Receive email updates" />
+          <:actions>
+            <.button phx-disable-with="Changing...">Subscribe</.button>
+          </:actions>
+        </.simple_form>
+      </div>
+      <div>
+        <.simple_form
           for={@password_form}
           id="password_form"
           action={~p"/users/log_in?_action=password_updated"}
@@ -90,6 +104,7 @@ defmodule PicChatWeb.UserSettingsLive do
     user = socket.assigns.current_user
     email_changeset = Accounts.change_user_email(user)
     password_changeset = Accounts.change_user_password(user)
+    subscriber_changeset = Accounts.change_user_subscription(user)
 
     socket =
       socket
@@ -98,9 +113,41 @@ defmodule PicChatWeb.UserSettingsLive do
       |> assign(:current_email, user.email)
       |> assign(:email_form, to_form(email_changeset))
       |> assign(:password_form, to_form(password_changeset))
+      |> assign(:subscriber_form, to_form(subscriber_changeset))
       |> assign(:trigger_submit, false)
 
+    # |> IO.inspect()
     {:ok, socket}
+  end
+
+  def handle_event("validate_subscriber", params, socket) do
+    %{"user" => user_params} = params
+
+    subscriber_form =
+      socket.assigns.current_user
+      |> Accounts.change_user_subscription(user_params)
+      |> Map.put(:action, :validate)
+      |> to_form()
+
+    {:noreply, assign(socket, subscriber_form: subscriber_form)}
+  end
+
+  def handle_event("update_subscriber", params, socket) do
+    %{"user" => user_params} = params
+    user = socket.assigns.current_user
+
+    case Accounts.update_user_subscription(user, user_params) do
+      {:ok, user} ->
+        subscriber_form =
+          user
+          |> Accounts.change_user_subscription(user_params)
+          |> to_form()
+
+        {:noreply, assign(socket, trigger_submit: true, subscriber_form: subscriber_form)}
+
+      {:error, changeset} ->
+        {:noreply, assign(socket, subscriber_form: to_form(changeset))}
+    end
   end
 
   def handle_event("validate_email", params, socket) do

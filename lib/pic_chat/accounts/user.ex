@@ -15,6 +15,12 @@ defmodule PicChat.Accounts.User do
     timestamps(type: :utc_datetime)
   end
 
+  def changeset(user, params) do
+    user
+    |> cast(params, [:subscribed])
+    |> validate_required([:subscribed])
+  end
+
   @doc """
   A user changeset for registration.
 
@@ -38,6 +44,11 @@ defmodule PicChat.Accounts.User do
       submitting the form), this option can be set to `false`.
       Defaults to `true`.
   """
+  def subscription_changeset(user, attrs, _opts \\ []) do
+    user
+    |> cast(attrs, [:subscribed])
+  end
+
   def registration_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:email, :password, :subscribed])
